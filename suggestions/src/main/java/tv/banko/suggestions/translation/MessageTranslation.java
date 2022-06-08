@@ -3,10 +3,13 @@ package tv.banko.suggestions.translation;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class MessageTranslation extends Translation {
 
@@ -14,8 +17,13 @@ public class MessageTranslation extends Translation {
         super("message", MessageTranslation.class.getClassLoader());
     }
 
-    public EmbedBuilder getEmbed(@Guild guild, String key, String authorUrl, String authorIconUrl, String titleUrl, String footerIcon, int fields) {
-        Locale locale = guild.getLocale();
+    @NotNull
+    public EmbedBuilder getEmbed(@NotNull String key, @Nullable Locale locale, @Nullable String authorUrl, @Nullable String authorIconUrl,
+                                 @Nullable String titleUrl, @Nullable String footerIcon, int fields) {
+
+        if (locale == null) {
+            locale = Locale.ENGLISH;
+        }
 
         String author = getNull(key + ".author", locale);
         String title = getNull(key + ".title", locale);
@@ -46,11 +54,13 @@ public class MessageTranslation extends Translation {
         return embed;
     }
 
-    public EmbedBuilder getEmbed(Guild guild, String key) {
-        return this.getEmbed(guild, key, null, null, null, null, 0);
+    @NotNull
+    public EmbedBuilder getEmbed(@NotNull String key, @Nullable Locale locale) {
+        return this.getEmbed(key, locale, null, null, null, null, 0);
     }
 
+    @NotNull
     public String get(String key, Guild guild, Object... format) {
-        return getNull(key, guild.getLocale(), format);
+        return Objects.requireNonNullElse(getNull(key, guild.getLocale(), format), key);
     }
 }

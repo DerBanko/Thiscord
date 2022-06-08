@@ -1,48 +1,44 @@
 package tv.banko.suggestions.database.collection;
 
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.FindOneAndReplaceOptions;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.*;
 import com.mongodb.reactivestreams.client.MongoCollection;
-import org.bson.Document;
+import org.jetbrains.annotations.NotNull;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import tv.banko.support.database.Database;
-import tv.banko.support.database.subscriber.EmptySubscriber;
-import tv.banko.support.ticket.Ticket;
+import tv.banko.suggestions.database.Database;
+import tv.banko.suggestions.database.subscriber.EmptySubscriber;
+import tv.banko.suggestions.suggestion.Suggestion;
 
-public record TicketCollection(Database database) {
+public record SuggestionCollection(Database database) {
 
-    public TicketCollection(Database database) {
+    public SuggestionCollection(Database database) {
         this.database = database;
 
         getCollection().createIndex(Indexes.ascending("id"), new IndexOptions().unique(true))
                 .subscribe(new EmptySubscriber<>());
     }
 
-    public void setTicket(Ticket ticket) {
-        MongoCollection<Document> collection = getCollection();
+    public void setSuggestion(Suggestion suggestion) {
+        MongoCollection<Suggestion> collection = getCollection();
 
-        collection.findOneAndReplace(Filters.eq("id", ticket.getId()), ticket.toDocument(),
-                new FindOneAndReplaceOptions().upsert(true)).subscribe(new EmptySubscriber<>());
+        collection.insertOne(suggestion, new InsertOneOptions().bypassDocumentValidation(true)).subscribe(new EmptySubscriber<>());
     }
 
-    public void loadTickets() {
-        getCollection().find(Filters.eq("closed", false)).subscribe(new Subscriber<>() {
+    public void load() {
+        getCollection().find().subscribe(new Subscriber<>() {
             @Override
             public void onSubscribe(Subscription s) {
                 s.request(Long.MAX_VALUE);
             }
 
             @Override
-            public void onNext(Document document) {
-                if (document == null) {
+            public void onNext(Suggestion suggestion) {
+                if (suggestion == null) {
                     return;
                 }
 
                 try {
-                    database.getBot().getTicket().addTicket(new Ticket(database.getBot().getTicket(), document));
+                    database.getSuggestions().getManager().addSuggestion(suggestion);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -59,7 +55,14 @@ public record TicketCollection(Database database) {
         });
     }
 
-    public MongoCollection<Document> getCollection() {
-        return database.getDatabase().getCollection("tickets");
+    public void deleteSuggestion(Suggestion suggestion) {
+        MongoCollection<Suggestion> collection = getCollection();
+
+        collection.deleteOne(Filters.eq(suggestion)).subscribe(new EmptySubscriber<>());
+    }
+
+    @NotNull
+    public MongoCollection<Suggestion> getCollection() {
+        return database.getDatabase().getCollection("tickets", Suggestion.class);
     }
 }

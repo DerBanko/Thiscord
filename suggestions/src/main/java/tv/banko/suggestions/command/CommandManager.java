@@ -1,12 +1,10 @@
-package tv.banko.butils.bot.command;
+package tv.banko.suggestions.command;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.jetbrains.annotations.NotNull;
-import tv.banko.butils.bot.Bot;
-import tv.banko.butils.bot.command.license.LicenseCommand;
-import tv.banko.butils.bot.command.user.DeleteDataCommand;
+import tv.banko.suggestions.Suggestions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,11 +17,10 @@ public class CommandManager extends ListenerAdapter {
         this.list = new ArrayList<>();
     }
 
-    public void load(Bot bot) {
-        list.add(new LicenseCommand(bot));
-        list.add(new DeleteDataCommand(bot));
+    public void load(@NotNull Suggestions suggestions) {
+        list.add(new SuggestionCommand(suggestions));
 
-        CommandListUpdateAction commands = bot.getBot().updateCommands();
+        CommandListUpdateAction commands = suggestions.getBot().updateCommands();
 
         for (CommandObject object : list) {
             commands = commands.addCommands(object.getCommand());

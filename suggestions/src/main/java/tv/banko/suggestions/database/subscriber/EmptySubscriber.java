@@ -1,4 +1,4 @@
-package tv.banko.support.database.subscriber;
+package tv.banko.suggestions.database.subscriber;
 
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;

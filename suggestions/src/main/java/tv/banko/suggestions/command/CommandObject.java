@@ -1,15 +1,16 @@
-package tv.banko.butils.bot.command;
+package tv.banko.suggestions.command;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import tv.banko.butils.bot.Bot;
+import org.jetbrains.annotations.NotNull;
+import tv.banko.suggestions.Suggestions;
 
 public abstract class CommandObject {
 
-    protected final Bot bot;
+    protected final Suggestions suggestions;
 
-    public CommandObject(Bot bot) {
-        this.bot = bot;
+    public CommandObject(@NotNull Suggestions suggestions) {
+        this.suggestions = suggestions;
     }
 
     public abstract CommandData getCommand();

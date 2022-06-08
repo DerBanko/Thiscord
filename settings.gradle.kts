@@ -1,2 +1,3 @@
-rootProject.name = "DiscordTools"
+rootProject.name = "Thiscord"
 
+include("suggestions")
