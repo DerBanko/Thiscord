@@ -11,13 +11,6 @@ import tv.banko.suggestions.suggestion.Suggestion;
 
 public record SuggestionCollection(Database database) {
 
-    public SuggestionCollection(Database database) {
-        this.database = database;
-
-        getCollection().createIndex(Indexes.ascending("id"), new IndexOptions().unique(true))
-                .subscribe(new EmptySubscriber<>());
-    }
-
     public void setSuggestion(Suggestion suggestion) {
         MongoCollection<Suggestion> collection = getCollection();
 
@@ -63,6 +56,6 @@ public record SuggestionCollection(Database database) {
 
     @NotNull
     public MongoCollection<Suggestion> getCollection() {
-        return database.getDatabase().getCollection("tickets", Suggestion.class);
+        return database.getDatabase().getCollection("channel", Suggestion.class);
     }
 }

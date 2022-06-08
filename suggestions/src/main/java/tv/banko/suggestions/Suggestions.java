@@ -28,14 +28,13 @@ public class Suggestions {
 
     public Suggestions(String token) throws LoginException, InterruptedException {
         JDA bot;
-        JDABuilder builder = JDABuilder.createDefault(token);
+        JDABuilder builder = JDABuilder.createDefault(token, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_EMOJIS);
 
         this.message = new MessageTranslation();
         this.common = new CommonTranslation();
         CommandManager commandManager = new CommandManager();
 
         builder.disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE);
-        builder.setEnabledIntents(Arrays.stream(GatewayIntent.values()).toList());
         builder.setBulkDeleteSplittingEnabled(false);
         builder.setActivity(Activity.listening(common.get("activity") + " \uD83D\uDCC3"));
         builder.addEventListeners(commandManager);

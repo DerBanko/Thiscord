@@ -100,7 +100,7 @@ public class SuggestionCommand extends CommandObject {
                         boolean voteReactions = event.getOption("vote") != null &&
                                 Objects.requireNonNull(event.getOption("vote")).getAsBoolean();
 
-                        if (jsonMapping == null) {
+                        if (jsonMapping == null || jsonMapping.getAsString().isEmpty()) {
                             channel.retrieveMessageById(channel.getLatestMessageIdLong()).queue(latestMessage -> {
                                 if (latestMessage == null) {
                                     hook.editOriginalEmbeds(message.getEmbed("command.no_message", event.getUserLocale())
@@ -166,11 +166,12 @@ public class SuggestionCommand extends CommandObject {
                                             .build()).queue();
                                 });
                             }
-                            case "delete" -> hook.editOriginalEmbeds(message.getEmbed("command.delete", event.getUserLocale())
-                                            .setAuthor(user.getName(), null, user.getEffectiveAvatarUrl())
-                                            .build())
-                                    .setActionRows(ActionRow.of(Button.danger("delete.confirm", message.get("command.delete.button"))))
-                                    .queue();
+                            case "delete" ->
+                                    hook.editOriginalEmbeds(message.getEmbed("command.delete", event.getUserLocale())
+                                                    .setAuthor(user.getName(), null, user.getEffectiveAvatarUrl())
+                                                    .build())
+                                            .setActionRows(ActionRow.of(Button.danger("delete.confirm", message.get("command.delete.button"))))
+                                            .queue();
                             case "vote" -> {
                                 Suggestion newSuggestion = suggestions.getManager().recreateSuggestion(suggestion, !suggestion.vote());
 
@@ -200,10 +201,9 @@ public class SuggestionCommand extends CommandObject {
     }
 
     private void createSuggestion(InteractionHook hook, User user, Message message, String name, Locale locale, boolean voteReactions) {
-        suggestions.getManager().createSuggestion(message, name, voteReactions).whenCompleteAsync((unused, throwable) -> {
-            hook.editOriginalEmbeds(suggestions.getMessage().getEmbed("command.created", locale)
-                    .setAuthor(user.getName(), null, user.getEffectiveAvatarUrl())
-                    .build()).queue();
-        });
+        suggestions.getManager().createSuggestion(message, name, voteReactions).whenCompleteAsync((unused, throwable) ->
+                hook.editOriginalEmbeds(suggestions.getMessage().getEmbed("command.created", locale)
+                        .setAuthor(user.getName(), null, user.getEffectiveAvatarUrl())
+                        .build()).queue());
     }
 }

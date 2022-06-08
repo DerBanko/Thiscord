@@ -43,6 +43,6 @@ public record MessageListener(Suggestions suggestions) implements EventListener 
             return;
         }
 
-        event.getMessage().addReaction(upVote).and(event.getMessage().addReaction(downVote)).queue();
+        event.getMessage().addReaction(upVote).and(event.getMessage().addReaction(downVote)).queue(unused -> {}, Throwable::printStackTrace);
     }
 }
