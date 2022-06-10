@@ -2,6 +2,7 @@
 package tv.banko.suggestions.listener;
 
 import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.ThreadChannel;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -24,6 +25,18 @@ public record MessageListener(Suggestions suggestions) implements EventListener 
             return;
         }
 
+        if (event.isWebhookMessage()) {
+            return;
+        }
+
+        if (!event.isFromThread()) {
+            return;
+        }
+
+        if (event.getMessage().getAuthor().isBot()) {
+            return;
+        }
+
         Optional<Suggestion> optional = suggestions.getManager().getSuggestionByThreadId(channel.getId());
 
         if (optional.isEmpty()) {
@@ -43,6 +56,8 @@ public record MessageListener(Suggestions suggestions) implements EventListener 
             return;
         }
 
-        event.getMessage().addReaction(upVote).and(event.getMessage().addReaction(downVote)).queue(unused -> {}, Throwable::printStackTrace);
+        Message message = event.getMessage();
+
+        message.addReaction(upVote).queue(unused -> message.addReaction(downVote).queue());
     }
 }
