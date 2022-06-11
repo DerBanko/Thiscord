@@ -46,8 +46,8 @@ public class SuggestionManager {
                     threadChannel.getManager().setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK).setArchived(false)
                             .setLocked(false)
                             .and(threadChannel.getPermissionContainer().getManager().putRolePermissionOverride(
-                                    threadChannel.getGuild().getPublicRole().getIdLong(), List.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND,
-                                            Permission.MESSAGE_SEND_IN_THREADS), Collections.emptyList()))
+                                    threadChannel.getGuild().getPublicRole().getIdLong(), Collections.singleton(Permission.MESSAGE_SEND_IN_THREADS),
+                                    Collections.singleton(Permission.MESSAGE_SEND)))
                             .queue(unused -> future.complete(true));
                 });
         return future;
